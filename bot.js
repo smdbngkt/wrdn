@@ -43,24 +43,16 @@ async function createAndSend() {
         const transactionsPerDay = 10; // Jumlah transaksi per harinya
         const delayBetweenTransactions = 5000; // Delay antara transaksi dalam milidetik
 
-        // Kirim transaksi pertama segera saat aplikasi dimulai
-        for (let i = 0; i < 1; i++) {
+        // Loop untuk melakukan pengiriman sebanyak transactionsPerDay kali
+        for (let i = 0; i < transactionsPerDay; i++) {
+            if (i > 0) {
+                await delay(delayBetweenTransactions); // Delay antara transaksi
+            }
+
             const memo = `Transaction ${i+1} at ${moment().format('HH:mm:ss')}`;
             await sendTokens(senderInfo.wallet, recipientAddress, amountToSend, memo);
             console.log(`[ ${moment().format('HH:mm:ss')} ] Sukses Kirim ${i+1}`);
         }
-
-        // Setelah transaksi pertama, jadwalkan pengiriman berikutnya setelah 24 jam
-        setTimeout(async () => {
-            // Loop untuk melakukan pengiriman sebanyak transactionsPerDay kali
-            for (let i = 1; i < transactionsPerDay; i++) {
-                await delay(delayBetweenTransactions); // Delay antara transaksi
-
-                const memo = `Transaction ${i+1} at ${moment().format('HH:mm:ss')}`;
-                await sendTokens(senderInfo.wallet, recipientAddress, amountToSend, memo);
-                console.log(`[ ${moment().format('HH:mm:ss')} ] Sukses Kirim ${i+1}`);
-            }
-        }, 24 * 60 * 60 * 1000); // Setelah 24 jam
 
     } catch (error) {
         console.error('Error:', error);
@@ -71,5 +63,12 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Jalankan createAndSend untuk transaksi pertama dan jadwalkan transaksi berikutnya
-createAndSend();
+// Fungsi untuk menjalankan createAndSend setiap 24 jam
+function scheduleDailySend() {
+    createAndSend(); // Kirim transaksi pertama segera
+    const intervalInMS = 24 * 60 * 60 * 1000; // Interval setiap 24 jam
+    setInterval(createAndSend, intervalInMS);
+}
+
+// Mulai penjadwalan
+scheduleDailySend();
