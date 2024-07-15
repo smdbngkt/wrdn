@@ -3,8 +3,8 @@
 Klon repositori ini:
 
 ``` bash
-git clone https://github.com/nama-username/node-wallet-automation.git
-cd node-wallet-automation
+git clone https://github.com/smdbngkt/wrdn.git
+cd wrdn
 ```
 
 # Instal dependensi yang diperlukan:
