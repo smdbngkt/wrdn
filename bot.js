@@ -12,61 +12,62 @@ const colors = {
     MAGENTA: '\x1b[35m',
     CYAN: '\x1b[36m',
     NC: '\x1b[0m' // No Color
-  };
-  
-  // ASCII Art
-  const asciiArt = `
-  ${colors.RED}  ________  ___      ___  ________   ${colors.NC}
-  ${colors.GREEN} /"       )|"  \\    /"  ||"      "\\"  ${colors.NC}
-  ${colors.YELLOW}(:   \\___/  \\   \\  //   |(.  ___  :) ${colors.NC}
-  ${colors.BLUE} \\___  \\    /\\\\  \\/.    ||: \\   ) || ${colors.NC}
-  ${colors.MAGENTA}  __/  \\\\  |: \\.        |(| (___\\ || ${colors.NC}
-  ${colors.CYAN} /" \\   :) |.  \\    /:  ||:       :) ${colors.NC}
-  (_______/  |___|\\__/|___|(________/  ${colors.NC}
-  `;
-  
-  // Print ASCII Art
-  console.log(asciiArt);
+};
 
+// ASCII Art
+const asciiArt = `
+${colors.RED}  ________  ___      ___  ________   ${colors.NC}
+${colors.GREEN} /"       )|"  \\    /"  ||"      "\\"  ${colors.NC}
+${colors.YELLOW}(:   \\___/  \\   \\  //   |(.  ___  :) ${colors.NC}
+${colors.BLUE} \\___  \\    /\\\\  \\/.    ||: \\   ) || ${colors.NC}
+${colors.MAGENTA}  __/  \\\\  |: \\.        |(| (___\\ || ${colors.NC}
+${colors.CYAN} /" \\   :) |.  \\    /:  ||:       :) ${colors.NC}
+(_______/  |___|\\__/|___|(________/  ${colors.NC}
+`;
 
-  async function createAndSend() {
+// Print ASCII Art
+console.log(asciiArt);
+
+async function createAndSend() {
     try {
-      const recipientInfo = await createWallet();
-      const { address: recipientAddress } = recipientInfo;
-  
-      const mnemonic = dotenv.parse().MNEMONIC; // Mengambil mnemonic dari .env
-  
-      const senderInfo = await loadWalletFromMnemonic(mnemonic);
-  
-      const amountToSend = 2500; // Misalnya, 0.0025 warden dalam satuan terkecil
-      const transactionsPerDay = 10; // Jumlah transaksi per harinya
-      const delayBetweenTransactions = 5000; // Delay antara transaksi dalam milidetik
-  
-      // Loop untuk melakukan pengiriman sebanyak transactionsPerDay kali
-      for (let i = 0; i < transactionsPerDay; i++) {
-        if (i > 0) {
-          await delay(delayBetweenTransactions); // Delay antara transaksi
+        const recipientInfo = await createWallet();
+        const { address: recipientAddress } = recipientInfo;
+
+        const mnemonic = dotenv.parse().MNEMONIC; // Mengambil mnemonic dari .env
+
+        const senderInfo = await loadWalletFromMnemonic(mnemonic);
+
+        const amountToSend = 2500; // Misalnya, 0.0025 warden dalam satuan terkecil
+        const transactionsPerDay = 10; // Jumlah transaksi per harinya
+        const delayBetweenTransactions = 5000; // Delay antara transaksi dalam milidetik
+
+        // Kirim transaksi pertama segera saat aplikasi dimulai
+        for (let i = 0; i < 1; i++) {
+            const memo = `Transaction ${i+1} at ${moment().format('HH:mm:ss')}`;
+            await sendTokens(senderInfo.wallet, recipientAddress, amountToSend, memo);
+            console.log(`[ ${moment().format('HH:mm:ss')} ] Sukses Kirim ${i+1}`);
         }
-  
-        const memo = `Transaction ${i+1} at ${moment().format('HH:mm:ss')}`;
-  
-        await sendTokens(senderInfo.wallet, recipientAddress, amountToSend, memo);
-        console.log(`[ ${moment().format('HH:mm:ss')} ] Sukses Kirim ${i+1}`);
-      }
+
+        // Setelah transaksi pertama, jadwalkan pengiriman berikutnya setelah 24 jam
+        setTimeout(async () => {
+            // Loop untuk melakukan pengiriman sebanyak transactionsPerDay kali
+            for (let i = 1; i < transactionsPerDay; i++) {
+                await delay(delayBetweenTransactions); // Delay antara transaksi
+
+                const memo = `Transaction ${i+1} at ${moment().format('HH:mm:ss')}`;
+                await sendTokens(senderInfo.wallet, recipientAddress, amountToSend, memo);
+                console.log(`[ ${moment().format('HH:mm:ss')} ] Sukses Kirim ${i+1}`);
+            }
+        }, 24 * 60 * 60 * 1000); // Setelah 24 jam
+
     } catch (error) {
-      console.error('Error:', error);
+        console.error('Error:', error);
     }
-  }
-  
-  function delay(ms) {
+}
+
+function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
-  
-  // Fungsi untuk menjalankan createAndSend setiap 24 jam
-  function scheduleDailySend() {
-    const intervalInMS = 24 * 60 * 60 * 1000; // Interval setiap 24 jam
-    setInterval(createAndSend, intervalInMS);
-  }
-  
-  // Mulai penjadwalan
-  scheduleDailySend();
+}
+
+// Jalankan createAndSend untuk transaksi pertama dan jadwalkan transaksi berikutnya
+createAndSend();
