@@ -20,7 +20,6 @@ Buat file .env di direktori utama proyek dengan konten sebagai berikut:
 makefile
 ``` bash
 MNEMONIC=frasa_mnemonik_anda_di_sini
-Gantilah frasa_mnemonik_anda_di_sini dengan frasa mnemonik Anda yang sebenarnya.
 ```
 
 Jalankan aplikasi:
