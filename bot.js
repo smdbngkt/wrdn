@@ -65,9 +65,11 @@ function delay(ms) {
 
 // Fungsi untuk menjalankan createAndSend setiap 24 jam
 function scheduleDailySend() {
-    createAndSend(); // Kirim transaksi pertama segera
-    const intervalInMS = 24 * 60 * 60 * 1000; // Interval setiap 24 jam
-    setInterval(createAndSend, intervalInMS);
+    async function sendAndSchedule() {
+        await createAndSend(); // Kirim transaksi pertama segera
+        setTimeout(sendAndSchedule, 24 * 60 * 60 * 1000); // Jadwalkan pengiriman berikutnya setelah 24 jam
+    }
+    sendAndSchedule();
 }
 
 // Mulai penjadwalan
