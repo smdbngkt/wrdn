@@ -1,7 +1,6 @@
 require('dotenv').config();
 const { createWallet, loadWalletFromMnemonic, sendTokens } = require('./utils');
 const moment = require('moment');
-const dotenv = require('dotenv');
 
 // Define colors
 const colors = {
@@ -33,7 +32,10 @@ async function createAndSend() {
         const recipientInfo = await createWallet();
         const { address: recipientAddress } = recipientInfo;
 
-        const mnemonic = dotenv.parse().MNEMONIC; // Mengambil mnemonic dari .env
+        const mnemonic = process.env.MNEMONIC; // Mengambil mnemonic dari .env
+        if (!mnemonic) {
+            throw new Error('Mnemonic tidak ditemukan dalam file .env');
+        }
 
         const senderInfo = await loadWalletFromMnemonic(mnemonic);
 
