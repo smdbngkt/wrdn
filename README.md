@@ -11,6 +11,7 @@ cd wrdn
 
 ``` bash
 npm install
+npm install dotenv
 ```
 
 # Siapkan variabel lingkungan:
